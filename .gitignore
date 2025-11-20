@@ -1,2 +1,11 @@
 venv
 .env
+*__pycache__
+*.pyc
+node_modules
+dist
+build
+.DS_Store
+.vscode
+.idea
+npm-debug.log*

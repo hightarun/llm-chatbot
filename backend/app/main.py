@@ -9,15 +9,15 @@ from google import genai
 
 load_dotenv()
 
-API_KEY = os.getenv("GEMINI_API_KEY")
+API_KEY = os.getenv("LLM_API_KEY")
 if not API_KEY:
-    raise RuntimeError("GEMINI_API_KEY missing in backend/.env")
+    raise RuntimeError("LLM_API_KEY missing in backend/.env")
 
-GEMINI_MODEL = "gemini-2.0-flash-lite"
+LLM_MODEL = "gemini-2.0-flash-lite"
 
 client = genai.Client(api_key=API_KEY)
 
-app = FastAPI(title="Gemini Chatbot (Configurable Model)")
+app = FastAPI(title="LLM Chatbot")
 
 # Allow frontend
 app.add_middleware(
@@ -41,7 +41,7 @@ class SummaryRequest(BaseModel):
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "model": GEMINI_MODEL}
+    return {"status": "ok", "model": LLM_MODEL}
 
 
 @app.post("/chat")
@@ -53,10 +53,7 @@ async def chat(req: ChatRequest):
     history_text = "\n".join([f"{h['from']}: {h['text']}" for h in chat_history])
     prompt = f"{history_text}\nbot:"
 
-    result = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=prompt
-    )
+    result = client.models.generate_content(model=LLM_MODEL, contents=prompt)
 
     bot_text = result.text.strip()
     chat_history.append({"from": "bot", "text": bot_text})
@@ -72,10 +69,7 @@ async def summarize(req: SummaryRequest):
 
     prompt = f"Summarize the following:\n\n{text}"
 
-    result = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=prompt
-    )
+    result = client.models.generate_content(model=LLM_MODEL, contents=prompt)
 
     return {"summary": result.text.strip()}
 
